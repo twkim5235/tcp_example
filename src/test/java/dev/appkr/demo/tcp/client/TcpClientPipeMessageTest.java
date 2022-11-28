@@ -1,17 +1,15 @@
 package dev.appkr.demo.tcp.client;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import dev.appkr.demo.tcp.Item;
 import dev.appkr.demo.tcp.Packet;
 import dev.appkr.demo.tcp.config.TcpClientProperties;
 import dev.appkr.demo.tcp.tcpExample.PipeByteFormatter;
 import dev.appkr.demo.tcp.tcpExample.PipeByteParser;
 import dev.appkr.demo.tcp.tcpExample.PipeByteResponseTcpMessageTemplateFactory;
-import dev.appkr.demo.tcp.tcpExample.PipeByteTcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.visitor.Formatter;
 import dev.appkr.demo.tcp.visitor.Parser;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -26,13 +24,13 @@ public class TcpClientPipeMessageTest {
     final TcpClient client = new DisposableTcpClient(properties.getHost(), properties.getPort(),
         properties.getCharset());
 
-    Packet packet = createPacket();
+    final Packet packet = createPacket();
     packet.accept(formatter);
     client.write(packet.getTcpMessage());
-    Packet response = new Packet("root", client.read());
+    final Packet response = new Packet("root", client.read());
     response.accept(parser);
 
-    log.info("{}", response.toMap());
+    Assertions.assertThat(response.getMessageComponents().get(1).getValue()).isEqualTo("SUCCESS");
   }
 
   private Packet createPacket() {

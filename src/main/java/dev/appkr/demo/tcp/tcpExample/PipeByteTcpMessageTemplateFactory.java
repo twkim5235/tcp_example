@@ -7,7 +7,9 @@ import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PipeByteTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
   @Override
   public List<TcpMessage> create(byte[] tcpMessage, Charset charset) {

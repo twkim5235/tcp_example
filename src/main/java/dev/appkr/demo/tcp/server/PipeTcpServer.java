@@ -37,12 +37,14 @@ public class PipeTcpServer {
   final AtomicReference<List<Socket>> socketHolder = new AtomicReference<>(new ArrayList<>());
 
   final Formatter formatter;
+  final Parser parser;
 
-  public PipeTcpServer(TcpServerProperties properties, Formatter formatter) {
+  public PipeTcpServer(TcpServerProperties properties, Formatter formatter, Parser parser) {
     this.port = properties.getPort();
     this.executor = Executors.newFixedThreadPool(properties.getMaxConnection());
     this.charset = StandardCharsets.UTF_8;
     this.formatter = formatter;
+    this.parser = parser;
   }
 
   @SneakyThrows
@@ -63,11 +65,19 @@ public class PipeTcpServer {
           writer = new PrintWriter(socket.getOutputStream(), true);
           reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-          while ((reader.readLine()) != null) {
-            Packet packet = makeResponsePacket(UUID.randomUUID(), "SUCCESS");
+          String request;
+          while ((request = reader.readLine()) != null) {
+            try {
+              validRequestPacket(request);
+            } catch (Exception e) {
+              final Packet packet = makeResponsePacket(UUID.randomUUID(), "FAULT");
+              packet.accept(formatter);
+              writer.println(new String(packet.getTcpMessage(), charset));
+              break;
+            }
+            final Packet packet = makeResponsePacket(UUID.randomUUID(), "SUCCESS");
             packet.accept(formatter);
-            String message = new String(packet.getTcpMessage(), charset);
-            writer.println(message);
+            writer.println(new String(packet.getTcpMessage(), charset));
           }
         } catch (IOException e) {
           log.warn("{}: {}", e.getMessage(), socket.getPort());
@@ -84,10 +94,15 @@ public class PipeTcpServer {
     }
   }
 
+  private void validRequestPacket(String message) {
+    final Packet requestPacket = new Packet("root", message.getBytes(charset));
+    requestPacket.accept(parser);
+  }
+
   private Packet makeResponsePacket(UUID uuid, String result) {
     final Packet rootPacket = new Packet("root");
     rootPacket.add(Item.of("orderId", 1, uuid.toString()));
-    rootPacket.add(Item.of("result", 2, "result"));
+    rootPacket.add(Item.of("result", 2, result));
     return rootPacket;
   }
 
