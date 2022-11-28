@@ -6,6 +6,7 @@ import dev.appkr.demo.tcp.TcpMessage;
 import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.config.TcpClientProperties;
 import dev.appkr.demo.tcp.visitor.Parser;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -145,7 +146,7 @@ class FixedByteParserTest {
   static class FixedByteTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
 
     @Override
-    public List<TcpMessage> create(byte[] tcpMessage) {
+    public List<TcpMessage> create(byte[] tcpMessage, Charset charset) {
       final List<TcpMessage> components = new ArrayList<>();
       components.add(Item.of("messageType", 4));
       components.add(Item.of("serviceCode", 2));
