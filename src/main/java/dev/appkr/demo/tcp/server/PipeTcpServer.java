@@ -28,25 +28,20 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PipeTcpServer {
-  final int port;
-  final ExecutorService executor;
+public class PipeTcpServer extends TcpServer{
   final Charset charset;
-
-  final AtomicReference<ServerSocket> serverSocketHolder = new AtomicReference<>();
-  final AtomicReference<List<Socket>> socketHolder = new AtomicReference<>(new ArrayList<>());
 
   final Formatter formatter;
   final Parser parser;
 
   public PipeTcpServer(TcpServerProperties properties, Formatter formatter, Parser parser) {
-    this.port = properties.getPort();
-    this.executor = Executors.newFixedThreadPool(properties.getMaxConnection());
+    super(properties.getPort(), Executors.newFixedThreadPool(properties.getMaxConnection()));
     this.charset = StandardCharsets.UTF_8;
     this.formatter = formatter;
     this.parser = parser;
   }
 
+  @Override
   @SneakyThrows
   public void start() {
     final ServerSocket serverSocket = new ServerSocket(port);
@@ -104,26 +99,5 @@ public class PipeTcpServer {
     rootPacket.add(Item.of("orderId", 1, uuid.toString()));
     rootPacket.add(Item.of("result", 2, result));
     return rootPacket;
-  }
-
-  @PreDestroy
-  @SneakyThrows
-  public void stop() {
-    if (socketHolder != null) {
-      socketHolder.get().forEach(s -> {
-        try {
-          s.close();
-        } catch (IOException e) {
-          log.error(String.format("Connection to port %s was not closed", s.getPort()));
-        }
-      });
-    }
-
-    if (serverSocketHolder != null && serverSocketHolder.get() != null) {
-      serverSocketHolder.get().close();
-    }
-
-    executor.awaitTermination(5, TimeUnit.SECONDS);
-    executor.shutdown();
   }
 }

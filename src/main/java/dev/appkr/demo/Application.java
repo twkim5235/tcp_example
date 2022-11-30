@@ -4,6 +4,7 @@ import dev.appkr.demo.tcp.config.TcpClientProperties;
 import dev.appkr.demo.tcp.server.EchoServer;
 import dev.appkr.demo.tcp.config.TcpServerProperties;
 import dev.appkr.demo.tcp.server.PipeTcpServer;
+import dev.appkr.demo.tcp.server.TcpServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -14,9 +15,9 @@ import org.springframework.context.event.EventListener;
 @EnableConfigurationProperties({TcpServerProperties.class, TcpClientProperties.class})
 public class Application {
 
-	final PipeTcpServer pipeTcpServer;
+	final TcpServer pipeTcpServer;
 
-	public Application(PipeTcpServer pipeTcpServer) {
+	public Application(TcpServer pipeTcpServer) {
 		this.pipeTcpServer = pipeTcpServer;
 	}
 
