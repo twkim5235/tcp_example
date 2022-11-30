@@ -3,6 +3,7 @@ package dev.appkr.demo.tcp.server;
 import dev.appkr.demo.tcp.Packet;
 import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.config.TcpServerProperties;
+import dev.appkr.demo.tcp.service.ValidateRequestPacketService;
 import dev.appkr.demo.tcp.tcpExample.PipeByteResponseTcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.visitor.Formatter;
 import dev.appkr.demo.tcp.visitor.Parser;
@@ -25,19 +26,23 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PipeTcpServer extends TcpServer{
+public class PipeTcpServer extends TcpServer {
+
   final Charset charset;
 
   final Formatter formatter;
   final Parser parser;
   //Dip 위반이긴하나, parser의 factory와 구분하기 위해 인스턴스를 명시하였습니다.
   final TcpMessageTemplateFactory templateFactory = new PipeByteResponseTcpMessageTemplateFactory();
+  final ValidateRequestPacketService validateRequestPacketService;
 
-  public PipeTcpServer(TcpServerProperties properties, Formatter formatter, Parser parser) {
+  public PipeTcpServer(TcpServerProperties properties, Formatter formatter, Parser parser,
+      ValidateRequestPacketService validateRequestPacketService) {
     super(properties.getPort(), Executors.newFixedThreadPool(properties.getMaxConnection()));
     this.charset = StandardCharsets.UTF_8;
     this.formatter = formatter;
     this.parser = parser;
+    this.validateRequestPacketService = validateRequestPacketService;
   }
 
   @Override
@@ -63,7 +68,8 @@ public class PipeTcpServer extends TcpServer{
           while ((request = reader.readLine()) != null) {
             Packet response;
             try {
-              parseRequestPacket(request);
+              Packet requestPacket = parseRequestPacket(request);
+              validateRequestPacketService.validRequestPacket(requestPacket);
               response = makeResponsePacket(UUID.randomUUID(), "SUCCESS");
             } catch (Exception e) {
               response = makeResponsePacket(UUID.randomUUID(), "FAULT");
@@ -86,9 +92,10 @@ public class PipeTcpServer extends TcpServer{
     }
   }
 
-  private void parseRequestPacket(String message) {
+  private Packet parseRequestPacket(String message) {
     final Packet requestPacket = new Packet("root", message.getBytes(charset));
     requestPacket.accept(parser);
+    return requestPacket;
   }
 
   private Packet makeResponsePacket(UUID uuid, String result) {
