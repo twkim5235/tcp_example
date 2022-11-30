@@ -7,6 +7,7 @@ import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,6 +32,11 @@ public class PipeByteTcpMessageTemplateFactory implements TcpMessageTemplateFact
     components.add(subPacket);
 
     return components;
+  }
+
+  @Override
+  public TcpMessage createResponse(Map<String, String> response) {
+    return null;
   }
 
   public int getNoPipeline(byte[] tcpMessage, Charset charset) {

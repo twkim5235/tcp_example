@@ -9,6 +9,7 @@ import dev.appkr.demo.tcp.visitor.Parser;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -180,6 +181,11 @@ class FixedByteParserTest {
       components.add(Item.of("delegatedCsContact", 15));
 
       return components;
+    }
+
+    @Override
+    public TcpMessage createResponse(Map<String, String> response) {
+      return null;
     }
 
     public int getNoOfSubPacket(byte[] tcpMessage) {

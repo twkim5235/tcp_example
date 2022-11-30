@@ -7,6 +7,7 @@ import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PipeByteResponseTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
   @Override
@@ -18,8 +19,13 @@ public class PipeByteResponseTcpMessageTemplateFactory implements TcpMessageTemp
     return components;
   }
 
-  public int getNoPipeline(byte[] tcpMessage, Charset charset) {
-    String message = new String(tcpMessage, charset);
-    return message.length() - message.replace("|", "").length();
+  @Override
+  public TcpMessage createResponse(Map<String, String> response) {
+    final Packet rootPacket = new Packet("root");
+    int i = 1;
+    for (String key : response.keySet()) {
+      rootPacket.add(Item.of(key, i++, response.get(key)));
+    }
+    return rootPacket;
   }
 }

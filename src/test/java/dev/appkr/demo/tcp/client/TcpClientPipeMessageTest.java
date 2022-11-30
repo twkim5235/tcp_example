@@ -18,12 +18,11 @@ public class TcpClientPipeMessageTest {
   final TcpClientProperties properties = new TcpClientProperties();
   final Formatter formatter = new PipeByteFormatter();
   final Parser parser = new PipeByteParser(new PipeByteResponseTcpMessageTemplateFactory());
+  final TcpClient client = new DisposableTcpClient(properties.getHost(), properties.getPort(),
+      properties.getCharset());
 
   @Test
   void disposableTcpClient() throws Exception {
-    final TcpClient client = new DisposableTcpClient(properties.getHost(), properties.getPort(),
-        properties.getCharset());
-
     final Packet packet = createPacket();
     packet.accept(formatter);
     client.write(packet.getTcpMessage());
