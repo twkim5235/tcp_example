@@ -1,8 +1,9 @@
 package dev.appkr.demo.tcp.server;
 
-import dev.appkr.demo.tcp.Item;
 import dev.appkr.demo.tcp.Packet;
+import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.config.TcpServerProperties;
+import dev.appkr.demo.tcp.tcpExample.PipeByteResponseTcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.visitor.Formatter;
 import dev.appkr.demo.tcp.visitor.Parser;
 import java.io.BufferedReader;
@@ -13,15 +14,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.PreDestroy;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,6 +30,8 @@ public class PipeTcpServer extends TcpServer{
 
   final Formatter formatter;
   final Parser parser;
+  //Dip 위반이긴하나, parser의 factory와 구분하기 위해 인스턴스를 명시하였습니다.
+  final TcpMessageTemplateFactory templateFactory = new PipeByteResponseTcpMessageTemplateFactory();
 
   public PipeTcpServer(TcpServerProperties properties, Formatter formatter, Parser parser) {
     super(properties.getPort(), Executors.newFixedThreadPool(properties.getMaxConnection()));
@@ -62,17 +61,15 @@ public class PipeTcpServer extends TcpServer{
 
           String request;
           while ((request = reader.readLine()) != null) {
+            Packet response;
             try {
-              validRequestPacket(request);
+              parseRequestPacket(request);
+              response = makeResponsePacket(UUID.randomUUID(), "SUCCESS");
             } catch (Exception e) {
-              final Packet packet = makeResponsePacket(UUID.randomUUID(), "FAULT");
-              packet.accept(formatter);
-              writer.println(new String(packet.getTcpMessage(), charset));
-              break;
+              response = makeResponsePacket(UUID.randomUUID(), "FAULT");
             }
-            final Packet packet = makeResponsePacket(UUID.randomUUID(), "SUCCESS");
-            packet.accept(formatter);
-            writer.println(new String(packet.getTcpMessage(), charset));
+            response.accept(formatter);
+            writer.println(new String(response.getTcpMessage(), charset));
           }
         } catch (IOException e) {
           log.warn("{}: {}", e.getMessage(), socket.getPort());
@@ -89,15 +86,16 @@ public class PipeTcpServer extends TcpServer{
     }
   }
 
-  private void validRequestPacket(String message) {
+  private void parseRequestPacket(String message) {
     final Packet requestPacket = new Packet("root", message.getBytes(charset));
     requestPacket.accept(parser);
   }
 
   private Packet makeResponsePacket(UUID uuid, String result) {
-    final Packet rootPacket = new Packet("root");
-    rootPacket.add(Item.of("orderId", 1, uuid.toString()));
-    rootPacket.add(Item.of("result", 2, result));
-    return rootPacket;
+    Map<String, String> map = new LinkedHashMap<>();
+    map.put("orderId", uuid.toString());
+    map.put("result", result);
+
+    return (Packet) templateFactory.createResponse(map);
   }
 }
