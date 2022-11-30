@@ -1,0 +1,72 @@
+@startuml
+
+package tcp {
+    interface TcpClient {
+        ' create Socket before writing
+        + write(message: byte[]): void
+        ' dispose Socket after reading
+        + read(): byte[]
+    }
+
+    class DisposableTcpClient implements TcpClient {
+    }
+
+    ' Parsing & Formatting: Visitor Pattern
+    interface Parceable <<visitable>> {
+        + accept(parser: Parser): void
+    }
+
+    interface Formattable <<visitable>> {
+        + accept(formatter: Formatter): void
+    }
+
+    interface Parser <<visitor>> {
+        + parse(parseable: Packet): void
+    }
+
+    class PipeByteParser implements Parser {
+    }
+
+    interface Formatter <<visitor>> {
+        + format(formattable: Packet): void
+    }
+
+    class PipeByteFormatter implements Formatter {
+    }
+
+    ' Tcp Message: Composite Pattern
+    interface TcpMessage <<component>> {
+        + getName(): String
+        + setName(name: String): void
+        + getPoiner(): int
+        + getValue(): String
+        + setValue(value: String)
+    }
+
+    class Packet <<composite>> implements Parceable, Formattable, TcpMessage {
+        - messageComponents: List<TcpMessage>
+        - tcpMessage: byte[]
+    }
+
+    class Item <<leaf>> implements TcpMessage {}
+
+    interface TcpMessageTemplateFactory {
+        + create(tcpMessage: byte[]): List<TcpMessage>
+        + createResponse(Map<String, String> response): TcpMessage
+    }
+
+    class PipeByteTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
+    }
+
+    class PipeByteResponseTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
+    }
+
+    Packet o-down-> TcpMessage
+    Parceable -down-> Parser
+    Formattable -down-> Formatter
+    Parser -down-> Packet
+    PipeByteParser -right-> TcpMessageTemplateFactory
+
+    Formatter -down-> Packet
+}
+@enduml
