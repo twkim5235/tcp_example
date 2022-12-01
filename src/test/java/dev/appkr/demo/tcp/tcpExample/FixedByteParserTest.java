@@ -6,8 +6,10 @@ import dev.appkr.demo.tcp.TcpMessage;
 import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.config.TcpClientProperties;
 import dev.appkr.demo.tcp.visitor.Parser;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -145,7 +147,7 @@ class FixedByteParserTest {
   static class FixedByteTcpMessageTemplateFactory implements TcpMessageTemplateFactory {
 
     @Override
-    public List<TcpMessage> create(byte[] tcpMessage) {
+    public List<TcpMessage> create(byte[] tcpMessage, Charset charset) {
       final List<TcpMessage> components = new ArrayList<>();
       components.add(Item.of("messageType", 4));
       components.add(Item.of("serviceCode", 2));
@@ -179,6 +181,11 @@ class FixedByteParserTest {
       components.add(Item.of("delegatedCsContact", 15));
 
       return components;
+    }
+
+    @Override
+    public TcpMessage createResponse(Map<String, String> response) {
+      return null;
     }
 
     public int getNoOfSubPacket(byte[] tcpMessage) {

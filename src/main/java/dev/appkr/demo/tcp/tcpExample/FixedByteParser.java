@@ -25,7 +25,7 @@ public class FixedByteParser implements Parser {
   @Override
   public void parse(Packet parseable) {
     final byte[] src = parseable.getTcpMessage();
-    final List<TcpMessage> components = templateFactory.create(src);
+    final List<TcpMessage> components = templateFactory.create(src, charset);
     parseable.setMessageComponents(components);
 
     doParse(src, components, new AtomicInteger(0));

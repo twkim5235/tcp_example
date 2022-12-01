@@ -1,0 +1,39 @@
+@startuml
+
+abstract class TcpServer {
+  - port: int
+  - executor: ExecutorService
+  - serverSocketHolder: AtomicReference<ServerSocket>
+  - socketHolder: AtomicReference<List<Socket>>
+  + start(): void
+  + stop(): void
+}
+
+class EchoServer implements TcpServer{
+  + start(): void
+}
+
+class PipeTcpServer implements TcpServer{
+  - charset: Charset
+  - formatter: Formatter
+  - parser: Parser
+  - parseRequestPacket: void
+  - makeResponsePacket: void
+  + start(): void
+}
+
+interface TcpMessageTemplateFactory{
+  + create(tcpMessage: byte[]): List<TcpMessage>
+  + createResponse(Map<String, String> response): TcpMessage
+}
+
+class TcpServerProperties {
+  - port: int
+  - maxConnection: int
+}
+
+PipeTcpServer -left-> TcpMessageTemplateFactory
+EchoServer -down-> TcpServerProperties
+PipeTcpServer -down-> TcpServerProperties
+
+@enduml

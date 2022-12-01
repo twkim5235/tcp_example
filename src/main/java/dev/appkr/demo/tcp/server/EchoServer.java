@@ -21,19 +21,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class EchoServer {
-
-  final int port;
-  final ExecutorService executor;
-
-  final AtomicReference<ServerSocket> serverSocketHolder = new AtomicReference<>();
-  final AtomicReference<List<Socket>> socketHolder = new AtomicReference<>(new ArrayList<>());
-
+public class EchoServer extends TcpServer{
   public EchoServer(TcpServerProperties properties) {
-    this.port = properties.getPort();
-    this.executor = Executors.newFixedThreadPool(properties.getMaxConnection());
+    super(properties.getPort(), Executors.newFixedThreadPool(properties.getMaxConnection()));
   }
 
+  @Override
   @SneakyThrows
   public void start() {
     final ServerSocket serverSocket = new ServerSocket(port);
@@ -69,26 +62,5 @@ public class EchoServer {
         }
       }, executor);
     }
-  }
-
-  @PreDestroy
-  @SneakyThrows
-  public void stop() {
-    if (socketHolder != null) {
-      socketHolder.get().forEach(s -> {
-        try {
-          s.close();
-        } catch (IOException e) {
-          log.error(String.format("Connection to port %s was not closed", s.getPort()));
-        }
-      });
-    }
-
-    if (serverSocketHolder != null && serverSocketHolder.get() != null) {
-      serverSocketHolder.get().close();
-    }
-
-    executor.awaitTermination(5, TimeUnit.SECONDS);
-    executor.shutdown();
   }
 }
