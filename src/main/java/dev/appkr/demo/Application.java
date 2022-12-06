@@ -1,10 +1,8 @@
 package dev.appkr.demo;
 
 import dev.appkr.demo.tcp.config.TcpClientProperties;
-import dev.appkr.demo.tcp.server.EchoServer;
 import dev.appkr.demo.tcp.config.TcpServerProperties;
-import dev.appkr.demo.tcp.server.PipeTcpServer;
-import dev.appkr.demo.tcp.server.TcpServer;
+import dev.appkr.demo.tcp.server.EchoServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
