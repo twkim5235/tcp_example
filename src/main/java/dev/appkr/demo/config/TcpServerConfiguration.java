@@ -1,5 +1,6 @@
 package dev.appkr.demo.config;
 
+import dev.appkr.demo.service.OrderServer;
 import dev.appkr.demo.tcp.server.EchoServer;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 public class TcpServerConfiguration {
 
   @Bean
-  ApplicationRunner tcpServerStarter(EchoServer server) {
+  ApplicationRunner tcpServerStarter(OrderServer server) {
     return (args) -> server.start();
   }
 }

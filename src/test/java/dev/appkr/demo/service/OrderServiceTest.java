@@ -26,6 +26,7 @@ class OrderServiceTest {
   void placeOrder() throws Exception {
     Mockito.doNothing().when(tcpClientMock).write(aRequestBytes());
     Mockito.when(tcpClientMock.read()).thenReturn(aResponseBytes());
+
     final PlaceOrderResponse aResponse = orderService.placeOrder(OrderFixtures.aRequest());
     log.info("response: {}", aResponse);
   }

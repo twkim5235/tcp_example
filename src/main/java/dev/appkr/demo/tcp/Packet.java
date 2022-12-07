@@ -1,7 +1,10 @@
 package dev.appkr.demo.tcp;
 
+import static dev.appkr.demo.service.Constants.DEFAULT_CHARSET;
+import static dev.appkr.demo.service.Constants.LINE_FEED;
 import static java.util.function.Function.identity;
 
+import dev.appkr.demo.service.Constants;
 import dev.appkr.demo.tcp.visitor.Formattable;
 import dev.appkr.demo.tcp.visitor.Formatter;
 import dev.appkr.demo.tcp.visitor.Parceable;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +30,7 @@ public class Packet implements Parceable, Formattable, TcpMessage {
   private String name;
   private int pointer = -1; // 편의를 위해 ISP(인터페이스 분리 원칙) 위반
   private String value;     // 편의를 위해 ISP(인터페이스 분리 원칙) 위반
+  @Getter(value = AccessLevel.NONE)
   private byte[] tcpMessage;
 
   public Packet(String name) {
@@ -56,5 +61,12 @@ public class Packet implements Parceable, Formattable, TcpMessage {
   public Map<String, TcpMessage> toMap() {
     return this.messageComponents.stream()
         .collect(Collectors.toMap(TcpMessage::getName, identity()));
+  }
+
+  public byte[] getTcpMessage() {
+    String message = new String(tcpMessage, DEFAULT_CHARSET);
+    boolean isEndWithLineFeed = message.endsWith(LINE_FEED);
+
+    return isEndWithLineFeed ? tcpMessage : (message + LINE_FEED).getBytes(DEFAULT_CHARSET);
   }
 }
