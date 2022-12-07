@@ -1,17 +1,16 @@
 package dev.appkr.demo.service;
 
+import static dev.appkr.demo.service.Constants.DEFAULT_CHARSET;
+import static dev.appkr.demo.service.Constants.REGEX_SEPARATOR;
+
 import dev.appkr.demo.tcp.Item;
 import dev.appkr.demo.tcp.Packet;
 import dev.appkr.demo.tcp.TcpMessage;
 import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
 import dev.appkr.demo.tcp.visitor.Parser;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class PipeSeparatedParser implements Parser {
-
-  private final static Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
   private final TcpMessageTemplateFactory factory;
 
@@ -25,18 +24,18 @@ public class PipeSeparatedParser implements Parser {
     final List<TcpMessage> components = factory.create(src);
     parseable.setMessageComponents(components);
 
-    doParser(src, components);
+    doParse(src, components);
   }
 
-  private void doParser(byte[] src, List<TcpMessage> components) {
+  private void doParse(byte[] src, List<TcpMessage> components) {
     String message = new String(src, DEFAULT_CHARSET);
-    String[] strings = message.split("\\|");
+    String[] parts = message.split(REGEX_SEPARATOR);
     components.stream()
         .forEach(component -> {
           if (component instanceof Item) {
-            component.setValue(strings[component.getPointer()]);
+            component.setValue(parts[component.getPointer()]);
           } else {
-            doParser(src, ((Packet)component).getMessageComponents());
+            doParse(src, ((Packet) component).getMessageComponents());
           }
         });
   }
