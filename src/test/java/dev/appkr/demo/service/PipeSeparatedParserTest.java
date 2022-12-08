@@ -11,7 +11,7 @@ class PipeSeparatedParserTest {
   @Test
   public void parse() throws Exception {
     //given
-    Parser parser = new PipeSeparatedParser(new PipeSeparatedTcpMessageTemplateFactory());
+    Parser parser = new PipeSeparatedParser(new PipeSeparatedResponseTemplateFactory());
     byte[] responseBytes = OrderFixtures.aResponseBytes();
     Packet responsePacket = new Packet("response", responseBytes);
 

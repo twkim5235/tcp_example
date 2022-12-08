@@ -20,7 +20,7 @@ public class OrderService {
 
   public OrderService(TcpClient tcpClient,
       @Qualifier("defaultFormatter") Formatter formatter,
-      @Qualifier("defaultParser") Parser parser) {
+      @Qualifier("responseParser") Parser parser) {
     this.tcpClient = tcpClient;
     this.formatter = formatter;
     this.parser = parser;
@@ -43,6 +43,8 @@ public class OrderService {
       // 수신된 메시지를 파싱하여 Packet으로 역직렬화한다
       resPacket = new Packet("root", res);
       resPacket.accept(parser);
+
+      log.info("response: {}", resPacket.toMap());
     } catch (Exception e) {
       log.error(e.getMessage());
     }

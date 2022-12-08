@@ -2,7 +2,8 @@ package dev.appkr.demo.config;
 
 import dev.appkr.demo.service.PipeSeparatedFormatter;
 import dev.appkr.demo.service.PipeSeparatedParser;
-import dev.appkr.demo.tcp.TcpMessageTemplateFactory;
+import dev.appkr.demo.service.PipeSeparatedRequestTemplateFactory;
+import dev.appkr.demo.service.PipeSeparatedResponseTemplateFactory;
 import dev.appkr.demo.tcp.client.DisposableTcpClient;
 import dev.appkr.demo.tcp.client.TcpClient;
 import dev.appkr.demo.tcp.config.TcpClientProperties;
@@ -10,6 +11,7 @@ import dev.appkr.demo.tcp.visitor.Formatter;
 import dev.appkr.demo.tcp.visitor.Parser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class TcpClientConfiguration {
@@ -32,7 +34,13 @@ public class TcpClientConfiguration {
   }
 
   @Bean
-  public Parser defaultParser(TcpMessageTemplateFactory factory) {
+  @Primary
+  public Parser requestParser(PipeSeparatedRequestTemplateFactory factory) {
+    return new PipeSeparatedParser(factory);
+  }
+
+  @Bean
+  public Parser responseParser(PipeSeparatedResponseTemplateFactory factory) {
     return new PipeSeparatedParser(factory);
   }
 }

@@ -1,7 +1,7 @@
 package dev.appkr.demo.service;
 
-import static dev.appkr.demo.service.Constants.DEFAULT_CHARSET;
-import static dev.appkr.demo.service.Constants.REGEX_SEPARATOR;
+import static dev.appkr.demo.service.OrderTcpMessage.DEFAULT_CHARSET;
+import static dev.appkr.demo.service.OrderTcpMessage.REGEX_SEPARATOR;
 
 import dev.appkr.demo.tcp.Item;
 import dev.appkr.demo.tcp.Packet;
