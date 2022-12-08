@@ -1,8 +1,9 @@
 package dev.appkr.demo.service;
 
+import static dev.appkr.demo.service.OrderTcpMessage.DEFAULT_CHARSET;
+import static dev.appkr.demo.service.OrderTcpMessage.LINE_FEED;
+
 import dev.appkr.demo.tcp.client.TcpClient;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,8 +11,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GreetingsTcpClient {
 
-  static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
-  static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
   private final TcpClient tcpClient;
 
   public String hello(String greeting) {
@@ -29,8 +28,8 @@ public class GreetingsTcpClient {
   }
 
   private String preprocess(String original) {
-    return original.endsWith(DEFAULT_LINE_SEPARATOR)
+    return original.endsWith(LINE_FEED)
         ? original
-        : original + DEFAULT_LINE_SEPARATOR;
+        : original + LINE_FEED;
   }
 }

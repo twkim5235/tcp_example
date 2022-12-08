@@ -1,5 +1,7 @@
 package dev.appkr.demo.service;
 
+import static dev.appkr.demo.service.OrderTcpMessage.DEFAULT_CHARSET;
+
 import dev.appkr.demo.tcp.Item;
 import dev.appkr.demo.tcp.Packet;
 import dev.appkr.demo.tcp.TcpMessage;
@@ -10,8 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PipeSeparatedFormatter implements Formatter {
-
-  private final static Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
   @Override
   public void format(Packet formattable) {

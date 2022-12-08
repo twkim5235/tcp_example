@@ -1,6 +1,7 @@
 package dev.appkr.demo.service;
 
 import static dev.appkr.demo.service.OrderTcpMessage.DEFAULT_CHARSET;
+import static dev.appkr.demo.service.OrderTcpMessage.ResponseField.SUCCESS_RESPONSE;
 
 import dev.appkr.demo.service.OrderTcpMessage.RequestField;
 import dev.appkr.demo.service.OrderTcpMessage.ResponseField;
@@ -48,7 +49,7 @@ public class OrderServer extends AbstractTcpServer {
     // 응답 메시지를 만든다
     Packet responsePacket = new Packet(ResponseField.PACKET_NAME);
     responsePacket.add(Item.of(ResponseField.ORDER_ID, 0, UUID.randomUUID().toString()));
-    responsePacket.add(Item.of(ResponseField.RESULT, 1, "SUCCESS"));
+    responsePacket.add(Item.of(ResponseField.RESULT, 1, SUCCESS_RESPONSE));
 
     // 응답 메시지를 포맷팅한다
     responsePacket.accept(formatter);

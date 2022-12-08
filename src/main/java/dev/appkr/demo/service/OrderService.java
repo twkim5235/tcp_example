@@ -1,5 +1,7 @@
 package dev.appkr.demo.service;
 
+import static dev.appkr.demo.service.OrderTcpMessage.ROOT_PACKET_NAME;
+
 import dev.appkr.demo.service.dto.PlaceOrderRequest;
 import dev.appkr.demo.service.dto.PlaceOrderResponse;
 import dev.appkr.demo.tcp.Packet;
@@ -28,7 +30,7 @@ public class OrderService {
 
   public PlaceOrderResponse placeOrder(PlaceOrderRequest req) {
     Packet reqPacket;
-    Packet resPacket = new Packet("root");
+    Packet resPacket = new Packet(ROOT_PACKET_NAME);
     try {
       // PlaceOrderRequest를 byte[]로 직렬화한다
       reqPacket = req.toPacket();
@@ -41,7 +43,7 @@ public class OrderService {
       final byte[] res = tcpClient.read();
 
       // 수신된 메시지를 파싱하여 Packet으로 역직렬화한다
-      resPacket = new Packet("root", res);
+      resPacket = new Packet(ROOT_PACKET_NAME, res);
       resPacket.accept(parser);
 
       log.info("response: {}", resPacket.toMap());

@@ -14,8 +14,10 @@ public class OrderTcpMessage {
   public static final String LINE_FEED = System.lineSeparator();
   public static final int NO_OF_PACKET_FIELDS = 5;
   public static final int NO_OF_SUBPACKET_FIELDS = 4;
+  public static final String ROOT_PACKET_NAME = "root";
 
   public static class RequestField {
+
     public static final String PACKET_NAME = "request";
     public static final String ORDERER_NAME = "ordererName";
     public static final String ORDERER_PHONE = "ordererPhone";
@@ -30,9 +32,11 @@ public class OrderTcpMessage {
   }
 
   public static class ResponseField {
+
     public static final String PACKET_NAME = "response";
     public static final String ORDER_ID = "orderId";
     public static final String RESULT = "result";
+    public static final String SUCCESS_RESPONSE = "SUCCESS";
   }
 
   public static String[] byteToStringArray(byte[] tcpMessage) {

@@ -10,15 +10,12 @@ class PipeSeparatedParserTest {
 
   @Test
   public void parse() throws Exception {
-    //given
     Parser parser = new PipeSeparatedParser(new PipeSeparatedResponseTemplateFactory());
     byte[] responseBytes = OrderFixtures.aResponseBytes();
     Packet responsePacket = new Packet("response", responseBytes);
 
-    //when
     parser.parse(responsePacket);
 
-    //then
     assertThat(responsePacket.toMap().get("orderId").getValue())
         .isEqualTo(OrderFixtures.DUMMY_ORDER_ID);
     assertThat(responsePacket.toMap().get("result").getValue())

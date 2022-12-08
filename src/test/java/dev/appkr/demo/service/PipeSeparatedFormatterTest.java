@@ -14,16 +14,13 @@ class PipeSeparatedFormatterTest {
 
   @Test
   public void format() throws Exception {
-    //given
     final Formatter formatter = new PipeSeparatedFormatter();
     Packet packet = new Packet("root");
     packet.add(Item.of("orderId", 0, ORDER_ID));
     packet.add(Item.of("address", 1, ADDRESS));
 
-    //when
     formatter.format(packet);
 
-    //then
     byte[] tcpMessage = packet.getTcpMessage();
     Assertions.assertThat(new String(tcpMessage, StandardCharsets.UTF_8))
         .isEqualTo(ORDER_ID + "|" + ADDRESS);
